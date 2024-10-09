@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Start Page</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h2>Add new user</h2>
+        <form action="SaveServlet" method="POST">
+            <table border="0">
+                <tbody>
+                    <tr>
+                        <th>Name</th>
+                        <th><input type="text" name="uName" value="" /></th>
+                    </tr>
+                    <tr>
+                        <td>Password</td>
+                        <td><input type="password" name="uPassword" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><input type="Email" name="Email" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td>Country</td>
+                        <td><select name="Country">
+                                <option value="VietNam">VietNam</option>
+                                <option value="USA">USA</option>
+                                <option value="UK">UK</option>
+                                <option value="Orther">Orther</option>
+                            </select></td>
+                    </tr>
+                </tbody>
+                
+            </table>
+            <input type="submit" value="save" name="Save" />
+        </form>
+        <a href="ViewServlet">View</a>
+    </body>
+</html>
