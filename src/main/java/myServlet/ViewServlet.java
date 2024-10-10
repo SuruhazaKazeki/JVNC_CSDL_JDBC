@@ -9,10 +9,11 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,8 +22,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Acer
  */
-@WebServlet(name = "SaveServlet", urlPatterns = {"/SaveServlet"})
-public class SaveServlet extends HttpServlet {
+public class ViewServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,56 +33,42 @@ public class SaveServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      * @throws java.lang.ClassNotFoundException
+     * @throws java.sql.SQLException
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, ClassNotFoundException {
+            throws ServletException, IOException, ClassNotFoundException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            //b1. lấy thông tin
-            String uName = request.getParameter("uName");
-            String uPassword = request.getParameter("uPassword");
-            String Email = request.getParameter("Email");
-            String Country = request.getParameter("Country");
-            //b2. xử lý yêu cầu
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            
+            /* TODO output your page here. You may use following sample code. */
             Connection conn;
             PreparedStatement ps;
-            
+            ResultSet rs;
+            String kq ="";
             try{
-                // nạp trình điều khiển
+                //1.Nạp trình điều khiển
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-                System.out.println("Nap ok");
-                // thiết lập kết nối
+                //2. thiết lập kết nối
                 conn = DriverManager.getConnection("jdbc:sqlserver://KAZEKI\\SQLEXPRESS;databaseName=demodb","sa","suzaki705");
-                System.out.println("ket noi ok");
-                // Tạo đối tượng thi hành truy vấn
-                ps = conn.prepareStatement("insert into users(name,password,email,country) values(?,?,?,?)");
-                ps.setString(1,uName);
-                ps.setString(2,uPassword);
-                ps.setString(3,Email);
-                ps.setString(4,Country);
-                // thi hành truy vấn
-                int kq = ps.executeUpdate();
-                // xử lý kết quả trả về
-                if(kq>0){
-                    out.println("<h2> lưu thành công</h2>");
-                }else{
-                    out.println("<h2> lưu thất bại</h2>");
+                //3. tạo đối tượng truy vấn
+                ps = conn.prepareStatement("select * from users");
+                //thi hành truy vấn dữ liệu
+                rs=ps.executeQuery();
+                //xử lý kết quả trả về
+                kq+="<table border =1";
+                kq +="<tr><td>Id</td><td>Name</td><td>Password</td><td>Email</td></tr>";
+                while(rs.next()){
+                    kq+="<tr>";
+                    kq+="<td>"+rs.getInt(1)+"</td>";
+                    kq+="<td>"+rs.getString(2)+"</td>";
+                    kq+="<td>"+rs.getString(3)+"</td>";
+                    kq+="<td>"+rs.getString(4)+"</td>";
+                    kq+="<tr>";
                 }
-                // đóng kết nối
-                conn.close();
-                
-            }catch (Exception e){
-                 System.out.println("lỗi" + e.toString());
+            }catch(Exception e){
+                System.out.println("lỗi" + e.toString());
                  System.out.println("<h2> lưu thất bại</h2>");
             }
-            
-            
-          
         }
-        // chèn nội dung của trang index.html trong trang phản hồi
-            request.getRequestDispatcher("index.html").include(request,response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -100,7 +86,9 @@ public class SaveServlet extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SaveServlet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ViewServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(ViewServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -118,7 +106,9 @@ public class SaveServlet extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SaveServlet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ViewServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(ViewServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
