@@ -10,10 +10,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,8 +19,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Acer
  */
-@WebServlet(name = "SaveServlet", urlPatterns = {"/SaveServlet"})
-public class SaveServlet extends HttpServlet {
+public class DeleteServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,49 +29,36 @@ public class SaveServlet extends HttpServlet {
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
-     * @throws java.lang.ClassNotFoundException
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException, ClassNotFoundException {
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            //b1. lấy thông tin
-            String uName = request.getParameter("uName");
-            String uPassword = request.getParameter("uPassword");
-            String Email = request.getParameter("Email");
-            String Country = request.getParameter("Country");
-            //b2. xử lý yêu cầu
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            
+            /* TODO output your page here. You may use following sample code. */
+            //b1.Lấy giá trị tham số từ client
+            String id = request.getParameter("id");
+            //b2.Xu ly yeu cầu và phản hồi kết quả
             Connection conn=DatabaseUtil.getConnection();
-            PreparedStatement ps;
-            
-            try{
-                
-                // nạp trình điều khiển
-                ps = conn.prepareStatement("insert into users(name,password,email,country) values(?,?,?,?)");
-                ps.setString(1,uName);
-                ps.setString(2,uPassword);
-                ps.setString(3,Email);
-                ps.setString(4,Country);
-                // thi hành truy vấn
+            PreparedStatement ps = null;
+            try {
+            //3.Tạo đối tượng thi hành truy vấn
+                ps = conn.prepareStatement("delete from users where id=" + id);
+            //4.Thi hành truy vấn
                 int kq = ps.executeUpdate();
-                // xử lý kết quả trả về
-                if(kq>0){
-                    out.println("<h2> lưu thành công</h2>");
-                }else{
-                    out.println("<h2> lưu thất bại</h2>");
+            //5.Xu ly ket qua tra ve
+                if (kq > 0) {
+                    out.println("<h2>Xoá user thành công</h2>");
+                } else {
+                    out.println("<h2>Xoá user thất bại</h2>");
                 }
-                // đóng kết nối
+            //6.dong ket noi
                 conn.close();
-                
-            }catch (Exception e){
-                 System.out.println("lỗi" + e.toString());
-                 System.out.println("<h2> lưu thất bại</h2>");
+            } catch (Exception e) {
+                out.println("<h2>Xoá user thất bại</h2>");
             }
-            // chèn nội dung của trang index.html trong trang phản hồi
-            request.getRequestDispatcher("index.html").include(request,response);
-        }        
+            //Chèn nội dung của ViewServlet trong kết quả phản hồi
+            request.getRequestDispatcher("ViewServlet").include(request, response);
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -90,11 +73,7 @@ public class SaveServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SaveServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        processRequest(request, response);
     }
 
     /**
@@ -108,11 +87,7 @@ public class SaveServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(SaveServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        processRequest(request, response);
     }
 
     /**

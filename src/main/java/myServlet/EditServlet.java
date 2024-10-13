@@ -11,9 +11,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Acer
  */
-public class ViewServlet extends HttpServlet {
+public class EditServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,56 +30,71 @@ public class ViewServlet extends HttpServlet {
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
-     * @throws java.lang.ClassNotFoundException
-     * @throws java.sql.SQLException
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws
+            ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
             //b1.lấy yêu cầu từ client
+            String id = request.getParameter("id");
             //b2. xu ly yeu cau
             Connection conn=DatabaseUtil.getConnection();
             PreparedStatement ps = null;
             ResultSet rs = null;
             String kq = "";
             try {
-                //1.Nap driver
-              
                 //3.Tạo đối tượng thi hành truy vấn
-                ps = conn.prepareStatement("select * from users");
+                ps = conn.prepareStatement("select * from users where id=" + id);
                 //4.Thi hành truy vấn
                 rs = ps.executeQuery();
                 //5.Xu ly ket qua tra ve
-                kq += "<table border=1>";
-                kq += "<tr>";
-                kq += "<td>Id</td><td>Name</td><td>Password</td><td>Email</td><td>Country</td><td>Edit</td><td>Delete</td >";
-                
-                kq += "</tr>";
-                while (rs.next()) {
-                    kq += "<tr>";
-                    kq += "<td>" + rs.getInt("id") + "</td><td>"
-                            + rs.getString("name") + "</td><td>" + rs.getString(3) + "</td><td>"
-                            + rs.getString(4) + "</td><td>" + rs.getString(5) + "</td><td>"
-                            + "<a href=EditServlet?id=" + rs.getInt(1) + ">Edit</a>"
-                            + "</td><td><a href=DeleteServlet?id=" + rs.getInt(1) + ">Delete</a></td>";
-                    kq += "</tr>";
+                if (rs.next()) {
+                    out.println("<!DOCTYPE html>");
+                    out.println("<html>");
+                    out.println("<head>");
+                    out.println("<title>Servlet EditServlet</title>");
+                    out.println("</head>");
+                    out.println("<body>");
+                    out.println("<h1>Update User</h1>");
+                    out.println("<form action='UpdateServlet' method='POST'>\n"
+                            + "<input type='hidden' name='id' value=" + id + ">"
+                            + " <table border='0'> \n"
+                            + " <tr>\n"
+                            + " <td>Name</td>\n"
+                            + " <td><input type='text' name='uname' value='" + rs.getString(2) + "' /></td>\n"
+                            + " </tr>\n"
+                            + " <tr>\n"
+                            + " <td>Password</td>\n"
+                            + " <td><input type='password' name='upass' value='" + rs.getString(3) + "'/></td>\n"
+                            + " </tr>\n"
+                            + " <tr>\n"
+                            + " <td>Email</td>\n"
+                            + " <td><input type='email' name='email' value='" + rs.getString(4) + "' /></td>\n"
+                            + " </tr>\n"
+                            + " <tr>\n"
+                            + " <td>Country</td>\n"
+                            + " <td>\n"
+                            + " <select name=\"country\">\n"
+                            + " <option value='Vietnam'>Vietnam</option>\n"
+                            + " <option value='USA'>USA</option>\n"
+                            + " <option value='UK'>UK</option>\n"
+                            + " <option value='Other'>Other</option>\n"
+                            + " </select>\n"
+                            + " </td>\n"
+                            + " </tr>\n"
+                            + " <tr>\n"
+                            + " <td colspan=2><input type='submit' value='Edit & Save' /></td>\n"
+                            + " </tr>\n"
+                            + " </table>\n"
+                            + " </form>");
+                    out.println("</body>");
+                    out.println("</html>");
                 }
-                kq += "</table>";
                 //6.dong ket noi
                 conn.close();
             } catch (Exception e) {
                 System.out.println("Loi:" + e.toString());
             }
-            //b3.phản hồi kết quả
-            out.println("<html>");
-            out.println("<body>");
-            out.println("<a href='index.html'>Add New User</a>");
-            out.println("<h1>Users List</h1>");
-            out.println(kq);
-            out.println("</body>");
-            out.println("</html>");
         }
     }
 
